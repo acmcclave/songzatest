@@ -26,13 +26,17 @@
 	// Do any additional setup after loading the view, typically from a nib.
     [self facebookLoginWithCompletion:^(NSString *userID, NSString *email, NSString *fullName) {
         NSLog(@"%@",userID);
-        self.email.text = email;
-        [self getFacebookFriendsListWithCompletion:^(NSArray *friendsDictionaries) {
-            
+        // set user name and email
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.usernameLabel.text = fullName;
+            self.email.text = email;
+        });
+        
+        // set user profile image
+        [self getFacebookProfileWithCompletion:^(NSData *profileImageData) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.profileImage.image = [UIImage imageWithData:friendsDictionaries[0]];
+                self.profileImage.image = [UIImage imageWithData:profileImageData];
             });
-            
         }];
     }];
     
@@ -85,7 +89,7 @@
 
 
 ////
-- (void)getFacebookFriendsListWithCompletion:(void(^)(NSArray *friendsDictionaries))completion
+- (void)getFacebookProfileWithCompletion:(void(^)(NSData *profileImageData))completion
 {
     NSURL *feedURL = [NSURL URLWithString:@"https://graph.facebook.com/me/picture"];
     ACAccountType *accountType = [self.accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierFacebook];
@@ -93,18 +97,17 @@
     
     NSDictionary *params = @{@"redirect":@1,
                              @"height": @200,
-                             @"width":@200,
+                             @"width":@200
                              };
     
     SLRequest *request = [SLRequest requestForServiceType:SLServiceTypeFacebook requestMethod:SLRequestMethodGET URL:feedURL parameters:params];
     [request setAccount:[accounts lastObject]];
     
     [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
-//        id responseObject = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingAllowFragments error:nil];
-        NSArray *friendDictionaries = [NSArray arrayWithObject:responseData];
-        
-        completion(friendDictionaries);
-        
+        NSData *profileImageData = responseData;
+        completion(profileImageData);
     }];
 }
+
+
 @end
