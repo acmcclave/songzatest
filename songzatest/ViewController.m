@@ -58,7 +58,7 @@
     ACAccountType *accountType = [self.accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierFacebook];
     
     NSDictionary *options = @{
-                              ACFacebookAppIdKey:@"1417604018498820",
+                              ACFacebookAppIdKey:@"1470242956526706",
                               ACFacebookPermissionsKey: @[@"read_stream", @"basic_info"],
                               
                               ACFacebookAudienceKey:ACFacebookAudienceFriends
@@ -95,9 +95,10 @@
     ACAccountType *accountType = [self.accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierFacebook];
     NSArray *accounts = [self.accountStore accountsWithAccountType:accountType];
     
-    NSDictionary *params = @{@"redirect":@1,
+    NSDictionary *params = @{@"redirect":@0,
                              @"height": @200,
-                             @"width":@200
+                             @"type": @"large",
+                             @"width":@200,
                              };
     
     SLRequest *request = [SLRequest requestForServiceType:SLServiceTypeFacebook requestMethod:SLRequestMethodGET URL:feedURL parameters:params];
