@@ -26,7 +26,17 @@
 	// Do any additional setup after loading the view, typically from a nib.
     [self facebookLoginWithCompletion:^(NSString *userID, NSString *email, NSString *fullName) {
         NSLog(@"%@",userID);
+        self.email.text = email;
+        [self getFacebookFriendsListWithCompletion:^(NSArray *friendsDictionaries) {
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.profileImage.image = [UIImage imageWithData:friendsDictionaries[0]];
+            });
+            
+        }];
     }];
+    
+    
     
 }
 
@@ -75,22 +85,26 @@
 
 
 ////
-//- (void)getFacebookFriendsListWithCompletion:(void(^)(NSArray *friendsDictionaries))completion
-//{
-//    NSURL *feedURL = [NSURL URLWithString:@"https://graph.facebook.com/me/friends"];
-//    ACAccountType *accountType = [self.accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierFacebook];
-//    NSArray *accounts = [self.accountStore accountsWithAccountType:accountType];
-//    
-//    NSDictionary *params = @{@"limit": @5000,
-//                             @"offset": @0};
-//    
-//    SLRequest *request = [SLRequest requestForServiceType:SLServiceTypeFacebook requestMethod:SLRequestMethodGET URL:feedURL parameters:params];
-//    [request setAccount:[accounts lastObject]];
-//    
-//    [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
+- (void)getFacebookFriendsListWithCompletion:(void(^)(NSArray *friendsDictionaries))completion
+{
+    NSURL *feedURL = [NSURL URLWithString:@"https://graph.facebook.com/me/picture"];
+    ACAccountType *accountType = [self.accountStore accountTypeWithAccountTypeIdentifier:ACAccountTypeIdentifierFacebook];
+    NSArray *accounts = [self.accountStore accountsWithAccountType:accountType];
+    
+    NSDictionary *params = @{@"redirect":@1,
+                             @"height": @200,
+                             @"width":@200,
+                             };
+    
+    SLRequest *request = [SLRequest requestForServiceType:SLServiceTypeFacebook requestMethod:SLRequestMethodGET URL:feedURL parameters:params];
+    [request setAccount:[accounts lastObject]];
+    
+    [request performRequestWithHandler:^(NSData *responseData, NSHTTPURLResponse *urlResponse, NSError *error) {
 //        id responseObject = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingAllowFragments error:nil];
-//        NSArray *friendDictionaries = ((NSDictionary *)responseObject)[@"data"];
-//        completion(friendDictionaries);
-//    }];
-//}
+        NSArray *friendDictionaries = [NSArray arrayWithObject:responseData];
+        
+        completion(friendDictionaries);
+        
+    }];
+}
 @end
