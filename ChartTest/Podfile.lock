@@ -1,0 +1,10 @@
+PODS:
+  - TEAChart (0.1)
+
+DEPENDENCIES:
+  - TEAChart
+
+SPEC CHECKSUMS:
+  TEAChart: a7ded6e5be2cfb260ea27e1384806b4ab6f694dc
+
+COCOAPODS: 0.29.0
